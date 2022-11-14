@@ -1,33 +1,34 @@
 import User from "../models/User.js"
-import bcrypt from "bcryptjs"
-import { createError } from "../utils/error.js"; 
+import bcrypt from "bcryptjs" 
 import jwt from "jsonwebtoken";
-//REGISTRATION
-export const register = async (req,res,next) =>{
-    try{
-        const salt = bcrypt.genSaltSync(10);
-    const hash = bcrypt.hashSync(req.body.password, salt);
 
 
-  
-        const newUser = new User({
-            username:req.body.username,
-            email:req.body.email,
-            password:hash,
-        });
 
-        await newUser.save()
-        res.status(200).json({
-            sucesss:true,
-            message:'working'
-        })
-    }catch(err){
-        next(err)
-    }
-};
+const register=async(req,res,next)=>{
 
-//LOGIN
-export const login = async (req,res,next) =>{
+    try {
+		const newPassword = await bcrypt.hash(req.body.password, 10)
+		await User.create({
+			name: req.body.name,
+			email: req.body.email,
+			password: newPassword,
+		})
+   
+		res.json({ status: 'ok' })
+    console.log(req.body)
+	} 
+  catch (err) {
+  console.log(err)
+		res.json({ status: 'error', error: err })
+	}
+}
+
+
+
+
+
+
+const login=async(req,res,next)=>{
     const user = await User.findOne({
 		email: req.body.email,
 	})
@@ -44,7 +45,7 @@ export const login = async (req,res,next) =>{
 	if (isPasswordValid) {
 		const token = jwt.sign(
 			{
-				username: user.username,
+				name: user.name,
 				email: user.email,
 			},
 			'secret123'
@@ -54,28 +55,22 @@ export const login = async (req,res,next) =>{
 	} else {
 		return res.json({ status: 'error', user: false })
 	}
-    // try{
-    //     const user = await User.findOne({ username: req.body.username });
-    //     if(!user) return next(createError(404, "User not found"));
-      
-    //     const isPasswordCorrect = await bcrypt.compare(
-    //         req.body.password, 
-    //         user.password
-    //         );
+}
 
-    //     if(!isPasswordCorrect) 
-    //     return next(createError(400, "Wrong password or username"));
-        
-    //     const token = jwt.sign({id:user._id, isAdmin: user.isAdmin}, process.env.JWT)
-        
-    //     //not to show password
-    //     const{password, isAdmin, ...otherDetails } = user._doc;    
 
-    //     //doesent allow anybody to access the cookie
-    //     res.cookie("access_token", token, {
-    //         httpOnly:true
-    //     }).status(200).json({...otherDetails});
-    // }catch(err){
-    //     next(err)
-    // }
-};
+
+
+const logout=async(req,res,next)=>{
+    res.cookie("token", null, {
+        expires: new Date(Date.now()),
+        httpOnly: true,
+      });
+    
+      res.status(200).json({
+        success: true,
+        message: "Logged Out",
+      });
+}
+
+
+export {login , logout ,register}

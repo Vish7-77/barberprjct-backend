@@ -14,10 +14,14 @@ import cors from "cors"
 import cookieParser from "cookie-parser"
 const app =express();
 import mongoose from "mongoose"
-import middleware from "./middleware.js"
+
 import jwt from "jsonwebtoken"
 import bcrypt from "bcryptjs"
-import isAuth from "./middleware.js"
+
+import { ok } from "assert"
+import { nextTick } from "process"
+import Res from "./models/Reserv.js"
+import reserv from "./models/Reserv.js"
 
 app.use(cors())
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -46,73 +50,107 @@ app.use(express.json());
 
 
 
+//importing the routes
+
+import user from "./routes/auth.js";
+import reservation from "./routes/reservation.js"
+
+
+
+
+
+app.use('/api/v1',reservation)
+app.use("/api/v1",user)
 
 //logout route
-app.get('/api/logout',async(req,res)=>{
-  res.cookie("token", null, {
-    expires: new Date(Date.now()),
-    httpOnly: true,
-  });
+// app.get('/api/logout',async(req,res)=>{
+//   res.cookie("token", null, {
+//     expires: new Date(Date.now()),
+//     httpOnly: true,
+//   });
 
-  res.status(200).json({
-    success: true,
-    message: "Logged Out",
-  });
-})
+//   res.status(200).json({
+//     success: true,
+//     message: "Logged Out",
+//   });
+// })
 
+// app.post('/api/reserv',async(req,res)=>{
+// try {
+// 	const Reservation=await Res.create(req.body)
+// 	console.log(Reservation)
+//   res.status(200).json({
+// 	success:true,
+// 	Reservation
+//   })
 
+// } catch (error) {
+// 	console.log(error)
+// }
+
+// })
+
+// app.get('/api/reserv',async(req,res)=>{
+	
+// res.status(200).json({
+// 	successs:true,
+// 	Reservation
+
+// })
+
+// })
 
 
 //register
-app.post('/api/register', async (req, res) => {
+// app.post('/api/register', async (req, res) => {
 	
-	try {
-		const newPassword = await bcrypt.hash(req.body.password, 10)
-		await User.create({
-			name: req.body.name,
-			email: req.body.email,
-			password: newPassword,
-		})
+// 	try {
+// 		const newPassword = await bcrypt.hash(req.body.password, 10)
+// 		await User.create({
+// 			name: req.body.name,
+// 			email: req.body.email,
+// 			password: newPassword,
+// 		})
    
-		res.json({ status: 'ok' })
-    console.log(req.body)
-	} 
-  catch (err) {
-  console.log(err)
-		res.json({ status: 'error', error: err })
-	}
-})
+// 		res.json({ status: 'ok' })
+//     console.log(req.body)
+// 	} 
+//   catch (err) {
+//   console.log(err)
+// 		res.json({ status: 'error', error: err })
+// 	}
+// })
 
 
 //login
-app.post('/api/login', async (req, res) => {
-	const user = await User.findOne({
-		email: req.body.email,
-	})
+// app.post('/api/login', async (req, res) => {
+// 	const user = await User.findOne({
+// 		email: req.body.email,
+// 	})
 
-	if (!user) {
-		return { status: 'error', error: 'Invalid login' }
-	}
+// 	if (!user) {
+// 		return { status: 'error', error: 'Invalid login' }
+// 	}
 
-	const isPasswordValid = await bcrypt.compare(
-		req.body.password,
-		user.password
-	)
+// 	const isPasswordValid = await bcrypt.compare(
+// 		req.body.password,
+// 		user.password
+// 	)
 
-	if (isPasswordValid) {
-		const token = jwt.sign(
-			{
-				name: user.name,
-				email: user.email,
-			},
-			'secret123'
-		)
+// 	if (isPasswordValid) {
+// 		const token = jwt.sign(
+// 			{
+// 				name: user.name,
+// 				email: user.email,
+// 			},
+// 			'secret123'
+// 		)
 
-		return res.json({ status: 'ok', user: token })
-	} else {
-		return res.json({ status: 'error', user: false })
-	}
-})
+// 		return res.json({ status: 'ok', user: token })
+// 	} else {
+// 		return res.json({ status: 'error', user: false })
+// 	}
+// })
 
 
 
