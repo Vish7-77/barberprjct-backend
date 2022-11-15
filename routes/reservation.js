@@ -7,4 +7,4 @@ router.post('/reservation',resMain)
 router.get('/reservation',getRes)
 
 
-export default router;
+export default router;  

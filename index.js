@@ -39,6 +39,7 @@ try {
   }
 };
 
+
 //This is to show message if or if not its connected to mnogodb
 mongoose.connection.on("disconnected", ()=>{
     console.log("mnogoDB disconnected!")
@@ -58,9 +59,13 @@ import reservation from "./routes/reservation.js"
 
 
 
-
+//using the routes
 app.use('/api/v1',reservation)
 app.use("/api/v1",user)
+
+
+
+
 
 //logout route
 // app.get('/api/logout',async(req,res)=>{
